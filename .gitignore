@@ -13,6 +13,7 @@ doxygen/
 !.config.in
 !.config.cmake.in
 !.gitignore
+!.gitlab-ci.yml
 *~
 *.o
 *.out

@@ -641,6 +641,18 @@ const Option<std::string> Options::ReadAnder(
     ""
 );
 
+const Option<std::string> Options::BraceletPtsTo(
+    "bracelet-pointsto",
+    "-bracelet-pointsto write points-to results to a user-specified text file",
+    ""
+);
+
+const Option<std::string> Options::BraceletCallGraph(
+    "bracelet-callgraph",
+    "-bracelet-callgraph write callgraph results to a user-specified text file",
+    ""
+);
+
 const Option<bool> Options::DiffPts(
     "diff",
     "Enable differential point-to set",

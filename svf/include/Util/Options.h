@@ -221,6 +221,9 @@ public:
     static OptionMultiple<PointerAnalysis::PTATY> PASelected;
     static OptionMultiple<u32_t> AliasRule;
 
+    static const Option<std::string> BraceletPtsTo;
+    static const Option<std::string> BraceletCallGraph;
+
     // DOTGraphTraits
     static const Option<bool> ShowHiddenNode;
 

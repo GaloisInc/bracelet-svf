@@ -1,24 +1,31 @@
-add_subdirectory(SABER)
-add_subdirectory(WPA)
-add_subdirectory(Example)
-add_subdirectory(DDA)
-add_subdirectory(MTA)
-add_subdirectory(CFL)
-add_subdirectory(LLVM2SVF)
-add_subdirectory(AE)
-
-set(ALL_TOOLS
-    ae
-    cfl
-    dvf
-    llvm2svf
-    mta
-    saber
-    svf-ex
-    wpa
+set(
+  SVF_TOOLS
+  "SABER;WPA;Bracelet;Example;DDA;MTA;CFL;LLVM2SVF;AE"
+  CACHE STRING "SVF tools to build; entries may be tool directories or target names"
 )
 
-foreach(_tool IN LISTS ALL_TOOLS)
+function(add_svf_tool _dir _target)
+  if("${_dir}" IN_LIST SVF_TOOLS OR "${_target}" IN_LIST SVF_TOOLS)
+    add_subdirectory(${_dir})
+    list(APPEND SVF_ENABLED_TOOLS ${_target})
+    set(SVF_ENABLED_TOOLS
+        "${SVF_ENABLED_TOOLS}"
+        PARENT_SCOPE
+    )
+  endif()
+endfunction()
+
+add_svf_tool(SABER saber)
+add_svf_tool(WPA wpa)
+add_svf_tool(Bracelet bracelet)
+add_svf_tool(Example svf-ex)
+add_svf_tool(DDA dvf)
+add_svf_tool(MTA mta)
+add_svf_tool(CFL cfl)
+add_svf_tool(LLVM2SVF llvm2svf)
+add_svf_tool(AE ae)
+
+foreach(_tool IN LISTS SVF_ENABLED_TOOLS)
   # Link the SvfLLVM library against SVF's core & LLVM libraries
   target_link_libraries(${_tool} PRIVATE SvfCore SvfLLVM)
 

@@ -1,0 +1,42 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SUBMODULE_DEPTH: 16
+
+stages:
+  - build
+  - downstream
+
+build-it-cromulence:
+  rules:
+    - if: "$CI_PROJECT_URL =~ /gitlab\\.ebossproject\\.com/"
+  timeout: 4h
+  stage: build
+  image:
+    name: ${CI_REGISTRY}/general/docker-images/docker-builder:latest
+  script:
+    - |
+      cat > s3.sh << EOF
+      export SCCACHE_REGION="us-east-2"
+      export SCCACHE_BUCKET="$S3_EPHEMERAL_BUCKET_NAME"
+      export SCCACHE_S3_KEY_PREFIX="$CI_PROJECT_PATH/svf-sccache/v1/"
+      EOF
+    # The build script misspelles "args" as "agrs", so we need to duplicate the misspelling here.
+    - >
+      KANIKO_EXTRA_ARGS="--compressed-caching=false"
+      KANIKO_EXTRA_AGRS="--compressed-caching=false"
+      TAGS=pipe-${CI_PIPELINE_ID}
+      NAME=svf
+      DOCKERFILE=galois.Dockerfile
+      /build.sh
+
+trigger-downstream:
+  stage: downstream
+  trigger: "galois/ci-infra"
+  variables:
+    SVF_IMAGE: "$CI_REGISTRY/$CI_PROJECT_PATH/svf:pipe-${CI_PIPELINE_ID}"
+  rules:
+    - if: "$CI_PROJECT_URL =~ /gitlab\\.ebossproject\\.com/"
+
+
+
+

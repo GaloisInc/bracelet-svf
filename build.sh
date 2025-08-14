@@ -14,6 +14,10 @@
 # Dependencies include: build-essential libncurses5 libncurses-dev cmake zlib1g-dev
 set -e # exit on first error
 
+if [[ -f "/opt/svf/s3.sh" ]]; then
+    source /opt/svf/s3.sh
+fi
+
 jobs=8
 
 #########
@@ -156,10 +160,11 @@ function build_llvm_from_source {
           -DLLVM_BUILD_LLVM_DYLIB=ON \
           -DLLVM_LINK_LLVM_DYLIB=ON \
           -DBUILD_SHARED_LIBS=ON \
+          -DCMAKE_C_COMPILER_LAUNCHER=sccache \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=sccache \
           ../llvm-source/*/llvm
     cmake --build . -j ${jobs}
     cmake --install .
-
     cd ..
     rm -r llvm-source llvm-build llvm.zip
 }
@@ -300,6 +305,7 @@ cmake -D CMAKE_BUILD_TYPE:STRING="${BUILD_TYPE}"   \
     -DSVF_ENABLE_ASSERTIONS:BOOL=true              \
     -DSVF_SANITIZE="${SVF_SANITIZER}"              \
     -DBUILD_SHARED_LIBS=${BUILD_DYN_LIB}            \
+    -DSVF_DEBUG_INFO:BOOL=true                      \
     -S "${SVFHOME}" -B "${BUILD_DIR}"
 cmake --build "${BUILD_DIR}" -j ${jobs}
 
